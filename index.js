@@ -1,7 +1,8 @@
+const https = require("https");
 const express = require("express");
-
 const app = express();
 const cors = require("cors");
+const fs = require("fs");
 
 const session = require("express-session");
 const secretKeys = require("./config/config");
@@ -33,13 +34,27 @@ passport.serializeUser(function (user, cb) {
 passport.deserializeUser(function (user, cb) {
     cb(null, user);
 });
+app.get("/flogin", passport.authenticate("facebook"));
 
-let secrets;
+app.get(
+    "/auth/facebook/callback",
+    passport.authenticate("facebook", { session: false }),
+    (req, res) => {
+        res.send("AUTH WAS GOOD!");
+    }
+);
+
+app.use(routes);
+
 (async () => {
+    let secrets;
+    let certKey;
     try {
         secretKeys().then((secret) => {
-            secrets = JSON.parse(secret);
+            secrets = JSON.parse(secret.secrets);
+            certKey = JSON.parse(secret.certKey);
             console.log("keys ", secrets);
+            console.log("certkey ", secret.certKey);
             passport.use(
                 new facebookStrategy(
                     {
@@ -56,25 +71,22 @@ let secrets;
                     }
                 )
             );
+            const options = {
+                key: fs.readFileSync("key.pem"),
+                cert: fs.readFileSync("cert.pem"),
+                passphrase: certKey.certKey,
+            };
+            https.createServer(options, app).listen(443, () => {
+                console.log("HTTPS server running on localhost on port 443");
+            });
         });
     } catch (err) {
         console.log("err");
     }
 })();
 
-app.get("/flogin", passport.authenticate("facebook"));
+// const PORT = 3000;
 
-app.get(
-    "/auth/facebook/callback",
-    passport.authenticate("facebook", { session: false }),
-    (req, res) => {
-        res.send("AUTH WAS GOOD!");
-    }
-);
-
-app.use(routes);
-const PORT = 3000;
-
-app.listen(PORT, (req, res) => {
-    console.log("Server is started ", PORT);
-});
+// app.listen(PORT, (req, res) => {
+//     console.log("Server is started ", PORT);
+// });
