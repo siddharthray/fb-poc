@@ -37,25 +37,26 @@ passport.deserializeUser(function (user, cb) {
 let secrets;
 (async () => {
     try {
-        secrets = JSON.parse(await secretKeys());
-        console.log("keys ", secrets);
-
-        passport.use(
-            new facebookStrategy(
-                {
-                    clientID: secrets.clientID,
-                    clientSecret: secrets.clientSecret,
-                    callbackURL:
-                        "https://ec2-43-205-240-221.ap-south-1.compute.amazonaws.com/auth/facebook/callback",
-                },
-                function (accessToken, refreshToken, profile, done) {
-                    console.log("acess token ", accessToken);
-                    console.log("refresh token ", refreshToken);
-                    console.log("profile ", profile);
-                    return done(null, profile);
-                }
-            )
-        );
+        secretKeys().then((secret) => {
+            secrets = JSON.parse(secret);
+            console.log("keys ", secrets);
+            passport.use(
+                new facebookStrategy(
+                    {
+                        clientID: secrets.clientID,
+                        clientSecret: secrets.clientSecret,
+                        callbackURL:
+                            "https://ec2-43-205-240-221.ap-south-1.compute.amazonaws.com/auth/facebook/callback",
+                    },
+                    function (accessToken, refreshToken, profile, done) {
+                        console.log("acess token ", accessToken);
+                        console.log("refresh token ", refreshToken);
+                        console.log("profile ", profile);
+                        return done(null, profile);
+                    }
+                )
+            );
+        });
     } catch (err) {
         console.log("err");
     }
