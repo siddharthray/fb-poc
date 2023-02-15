@@ -1,0 +1,21 @@
+<a href="/auth/facebook">
+    <h1>Login with Facebook</h1>
+</a>
+
+
+<script>
+    document.getElementById("basicFetchButton").addEventListener("click", function () {
+        // Loading the jQuery code
+        fetch('https://testtesttest.loca.lt', {
+            method: 'GET',
+            headers: {
+                'Bypass-Tunnel-Reminder': 'true'
+            }
+        }).then(function (response) {
+            response.text().then(function (responseText) {
+                console.log(responseText);
+                alert("Done using Fetch!");
+            });
+        });
+    });
+</script>
