@@ -4,14 +4,23 @@ const app = express();
 const cors = require("cors");
 
 const session = require("express-session");
+const secretKeys = require("./config/config");
+
+let secrets;
+(async () => {
+    try {
+        secrets = await secretKeys();
+        console.log("keys ", res);
+    } catch (err) {
+        console.log("err");
+    }
+})();
 
 const passport = require("passport");
 
 const facebookStrategy = require("passport-facebook").Strategy;
 
 const routes = require("./router/user");
-
-const config = require("./config/config");
 
 app.set("view engine", "ejs");
 
@@ -39,9 +48,10 @@ passport.deserializeUser(function (user, cb) {
 passport.use(
     new facebookStrategy(
         {
-            clientID: config.facebookAuth.clientID,
-            clientSecret: config.facebookAuth.clientSecret,
-            callbackURL: config.facebookAuth.callbackURL,
+            clientID: secretKeys.clientID,
+            clientSecret: secretKeys.clientSecret,
+            callbackURL:
+                "https://ec2-43-205-240-221.ap-south-1.compute.amazonaws.com/auth/facebook/callback",
         },
         function (accessToken, refreshToken, profile, done) {
             console.log("acess token ", accessToken);
@@ -65,11 +75,6 @@ app.get(
 app.use(routes);
 const PORT = 3000;
 
-app.listen(PORT, addCustomHeader, (req, res) => {
+app.listen(PORT, (req, res) => {
     console.log("Server is started ", PORT);
 });
-
-function addCustomHeader(req, res, next) {
-    req.headers["ngrok-skip-browser-warning"] = "66424";
-    next();
-}
