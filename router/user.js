@@ -11,9 +11,9 @@ router.get("/profile", isLoggedIn, (req, res) => {
     });
 });
 
-app.get("/flogin", passport.authenticate("facebook"));
+router.get("/flogin", passport.authenticate("facebook"));
 
-app.get(
+router.get(
     "/auth/facebook/callback",
     passport.authenticate("facebook", { session: false }),
     (req, res) => {
