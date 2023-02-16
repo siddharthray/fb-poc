@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const fs = require("fs");
+const path = require("path");
 
 const session = require("express-session");
 const secretKeys = require("./config/config");
@@ -72,12 +73,11 @@ app.use(routes);
                 )
             );
             const options = {
-                key: fs.readFileSync("key.pem"),
-                cert: fs.readFileSync("cert.pem"),
-                passphrase: certKey.certKey,
+                key: fs.readFileSync(path.join(__dirname, "cert", "key.pem")),
+                cert: fs.readFileSync(path.join(__dirname, "cert", "cert.pem")),
             };
-            https.createServer(options, app).listen(443, () => {
-                console.log("HTTPS server running on localhost on port 443");
+            https.createServer(options, app).listen(3000, () => {
+                console.log("HTTPS server running on localhost on port 3000");
             });
         });
     } catch (err) {
