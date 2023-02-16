@@ -72,7 +72,6 @@ function isLoggedIn(req, res, next) {
 
 (async () => {
     let secrets;
-    let certKey;
     let callbackUrl = "";
     if (process.env.NODE_ENV === "dev") {
         callbackUrl = "http://localhost:3000/auth/facebook/callback";
@@ -82,9 +81,7 @@ function isLoggedIn(req, res, next) {
     try {
         secretKeys().then((secret) => {
             secrets = JSON.parse(secret.secrets);
-            certKey = JSON.parse(secret.certKey);
             console.log("keys ", secrets);
-            console.log("certkey ", secret.certKey);
             passport.use(
                 new facebookStrategy(
                     {
