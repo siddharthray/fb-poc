@@ -73,6 +73,12 @@ function isLoggedIn(req, res, next) {
 (async () => {
     let secrets;
     let certKey;
+    let callbackUrl = "";
+    if (process.env.NODE_ENV === "dev") {
+        callbackUrl = "http://localhost:3000/auth/facebook/callback";
+    } else {
+        callbackUrl = "https://43.205.240.221:3000/auth/facebook/callback";
+    }
     try {
         secretKeys().then((secret) => {
             secrets = JSON.parse(secret.secrets);
@@ -84,9 +90,7 @@ function isLoggedIn(req, res, next) {
                     {
                         clientID: secrets.clientID,
                         clientSecret: secrets.clientSecret,
-                        callbackURL:
-                            // "https://localhost:3000/auth/facebook/callback",
-                            "https://43.205.240.221:3000/auth/facebook/callback",
+                        callbackURL: callbackUrl,
                     },
                     function (accessToken, refreshToken, profile, done) {
                         console.log("acess token ", accessToken);
@@ -101,9 +105,19 @@ function isLoggedIn(req, res, next) {
                 key: fs.readFileSync(path.join(__dirname, "cert", "key.pem")),
                 cert: fs.readFileSync(path.join(__dirname, "cert", "cert.pem")),
             };
-            https.createServer(options, app).listen(3000, () => {
-                console.log("HTTPS server running on localhost on port 3000");
-            });
+            if (process.env.NODE_ENV === "dev") {
+                app.listen(3000, () => {
+                    console.log(
+                        "Server running successfuly running on port 3000"
+                    );
+                });
+            } else {
+                https.createServer(options, app).listen(3000, () => {
+                    console.log(
+                        "HTTPS server running on localhost on port 3000"
+                    );
+                });
+            }
         });
     } catch (err) {
         console.log("err");
