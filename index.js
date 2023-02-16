@@ -86,7 +86,7 @@ function isLoggedIn(req, res, next) {
                         clientSecret: secrets.clientSecret,
                         callbackURL:
                             // "https://localhost:3000/auth/facebook/callback",
-                            "https://43.205.240.221/auth/facebook/callback",
+                            "https://43.205.240.221:3000/auth/facebook/callback",
                     },
                     function (accessToken, refreshToken, profile, done) {
                         console.log("acess token ", accessToken);
