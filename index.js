@@ -9,9 +9,13 @@ const session = require("express-session");
 const secretKeys = require("./config/config");
 const passport = require("passport");
 
+const router = express.Router();
+
 const facebookStrategy = require("passport-facebook").Strategy;
 
 const routes = require("./router/user");
+
+let user;
 
 app.set("view engine", "ejs");
 
@@ -35,17 +39,36 @@ passport.serializeUser(function (user, cb) {
 passport.deserializeUser(function (user, cb) {
     cb(null, user);
 });
-app.get("/flogin", passport.authenticate("facebook"));
+router.get("/flogin", passport.authenticate("facebook"));
 
-app.get(
+router.get(
     "/auth/facebook/callback",
     passport.authenticate("facebook", { session: false }),
     (req, res) => {
-        res.send("AUTH WAS GOOD!");
+        res.render("pages/profile", {
+            user,
+        });
     }
 );
 
+router.get("/", (req, res) => {
+    res.render("pages/index.ejs");
+});
+
+router.get("/profile", isLoggedIn, (req, res) => {
+    res.render("pages/index.ejs", {
+        user,
+    });
+});
+
 app.use(routes);
+
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/");
+}
 
 (async () => {
     let secrets;
@@ -62,12 +85,14 @@ app.use(routes);
                         clientID: secrets.clientID,
                         clientSecret: secrets.clientSecret,
                         callbackURL:
-                            "https://localhost:3000/auth/facebook/callback",
+                            // "https://localhost:3000/auth/facebook/callback",
+                            "https://43.205.240.221:3000/auth/facebook/callback",
                     },
                     function (accessToken, refreshToken, profile, done) {
                         console.log("acess token ", accessToken);
                         console.log("refresh token ", refreshToken);
                         console.log("profile ", profile);
+                        user = profile;
                         return done(null, profile);
                     }
                 )
