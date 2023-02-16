@@ -62,7 +62,7 @@ app.use(routes);
                         clientID: secrets.clientID,
                         clientSecret: secrets.clientSecret,
                         callbackURL:
-                            "https://ec2-43-205-240-221.ap-south-1.compute.amazonaws.com/auth/facebook/callback",
+                            "https://localhost:3000/auth/facebook/callback",
                     },
                     function (accessToken, refreshToken, profile, done) {
                         console.log("acess token ", accessToken);
@@ -84,9 +84,3 @@ app.use(routes);
         console.log("err");
     }
 })();
-
-// const PORT = 3000;
-
-// app.listen(PORT, (req, res) => {
-//     console.log("Server is started ", PORT);
-// });
